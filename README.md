@@ -27,3 +27,7 @@ python3 tools/build.py                                                          
 Editar siempre `src/index.template.html`, no `index.html`.
 
 Desarrollado por Mgter. Diego Ortiz — Líder de Mejora Continua | Consultor ISO
+
+
+## Base compartida (v2)
+`index.html` trabaja contra la API (`PlanillasdeControlAPI`, Neon): pide la clave de acceso, carga catálogos/estándares/cierres de la base y **autoguarda** cada cambio (indicador arriba a la derecha). `demo.html` es la versión local con datos simulados (sin base). Para cambiar la URL de la API, editar `API_URL` en `tools/build.py` y correr `python3 tools/build.py`.

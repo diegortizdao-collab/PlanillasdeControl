@@ -131,12 +131,14 @@ const TURNOS = ['MAÑANA','TARDE'];
 
 /* ===================== ESTADO / PERSISTENCIA ===================== */
 const LS = 'planillasdecontrol.v1';
+const API_URL = 'https://br-gentle-term-bbwokq5o-plancontrol.compute.c-15.us-east-1.aws.neon.tech';
+const SERVER = !!API_URL;
 let DB, mem = null;
 const clone = o => JSON.parse(JSON.stringify(o));
 function fresh(){return {v:1,cfg:{carga:{'MAÑANA':485,'TARDE':485},horario:{'MAÑANA':['06:00','15:00'],'TARDE':['14:30','23:30']},metas:{oa:90,rend:95,cal:98}},
   machines:clone(SEED_MACH),standards:clone(SEED_STD),cats:clone(SEED_CATS),causes:clone(SEED_CAUSES),records:{},turnos:{},demoLoaded:false};}
 function loadDB(){try{const s=localStorage.getItem(LS);if(s)return JSON.parse(s);}catch(e){}return mem;}
-function save(){mem=DB;try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
+function save(){mem=DB;if(SERVER){schedSync();return;}try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
 const UI = {tab:'carga',sub:'std',fecha:null,turno:'MAÑANA',maq:null,rf:{fecha:null,turno:'',maq:'',rango:'14'},sf:{maq:'',estado:'',q:''}};
 
 /* ===================== UTILIDADES ===================== */
@@ -266,9 +268,10 @@ function svgRadar(axes){
 
 /* ===================== VISTAS ===================== */
 const TABS=[['carga','📋 Carga de cierre'],['informe','📊 Informe diario'],['maestro','🛠 Ingeniería · Maestro'],['config','⚙ Configuración']];
-function renderTabs(){$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${UI.tab===k?'on':''}" onclick="go('${k}')">${l}</button>`).join('');}
+const tabsFor=()=>SERVER&&ROL==='carga'?TABS.filter(t=>t[0]==='carga'||t[0]==='informe'):TABS;
+function renderTabs(){$('#tabs').innerHTML=tabsFor().map(([k,l])=>`<button class="${UI.tab===k?'on':''}" onclick="go('${k}')">${l}</button>`).join('')+(SERVER?'<span id="syncst" style="margin-left:auto;font-size:12px;font-weight:700;align-self:center;padding-right:8px"></span>':'');if(SERVER)showSt();}
 function go(t){UI.tab=t;render();}
-function render(){renderTabs();const v=$('#view');
+function render(){if(!tabsFor().some(t=>t[0]===UI.tab))UI.tab='carga';renderTabs();const v=$('#view');
   ({carga:viewCarga,informe:viewInforme,maestro:viewMaestro,config:viewConfig})[UI.tab](v);window.scrollTo(0,0);}
 function demoBanner(){return DB.demoLoaded?`<div class="banner noprint">🧪 Hay <b>datos de demostración simulados</b> cargados (no son datos reales de planta). <button class="btn sm bad" onclick="clearDemo()">Borrar datos de demo</button></div>`:'';}
 
@@ -482,13 +485,21 @@ function viewConfig(v){const C=DB.cfg;
    <label class="f">Meta Rendimiento %<input type="number" value="${C.metas.rend}" onchange="DB.cfg.metas.rend=+this.value;save()"></label>
    <label class="f">Meta Calidad %<input type="number" value="${C.metas.cal}" onchange="DB.cfg.metas.cal=+this.value;save()"></label></div>
    <p class="mut">Carga = 9 h menos asakai, descansos, comida y limpieza (485 min netos por turno, como en la planilla). OA = Disponibilidad × Rendimiento.</p></div>
-  <div class="card"><h3>Datos</h3><div class="row">
+  ${dataCard()}`;}
+function dataCard(){
+  if(SERVER)return `<div class="card"><h3>Datos</h3><div class="row">
+   <button class="btn nv" onclick="dl('planillasdecontrol_backup_'+today()+'.json',JSON.stringify(DB),'application/json')">⬇ Backup (JSON)</button>
+   <button class="btn or" onclick="syncNow()">🔄 Guardar ahora</button>
+   <button class="btn ghost" onclick="logout()">Cerrar sesión</button></div>
+   <p class="mut">Base compartida (Neon): lo que se carga se guarda solo y lo ven todos los usuarios. Sesión: <b>${ROL==='ing'?'Ingeniería':'Carga'}</b>.</p></div></div>`;
+  return `<div class="card"><h3>Datos</h3><div class="row">
    <button class="btn nv" onclick="dl('planillasdecontrol_backup_'+today()+'.json',JSON.stringify(DB),'application/json')">⬇ Backup (JSON)</button>
    <label class="btn ok" style="cursor:pointer">⬆ Restaurar backup<input type="file" accept=".json" style="display:none" onchange="restore(this)"></label>
    <button class="btn vio" onclick="loadDemo();save();render()">🧪 Cargar datos de demo</button>
    <button class="btn bad" onclick="clearDemo()">Borrar datos de demo</button>
    <button class="btn or" onclick="resetAll()">Reiniciar todo</button></div>
-   <p class="mut">v1 guarda en este navegador. La base compartida entre turnos y la API están pendientes (repo PlanillasdeControlAPI).</p></div></div>`;}
+   <p class="mut">v1 guarda en este navegador. La base compartida entre turnos y la API están pendientes (repo PlanillasdeControlAPI).</p></div></div>`;
+}
 function restore(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{DB=JSON.parse(String(r.result).replace(/^﻿/,''));save();render();}catch(e){info('Archivo inválido');}};r.readAsText(f);}
 function resetAll(){ask('Se borra <b>todo</b> lo cargado y se restaura el maestro original. ¿Seguir?',()=>{DB=fresh();save();render();});}
 function clearDemo(){ask('Se borran solo los datos de demostración.',()=>{for(const k in DB.records)if(DB.records[k].demo)delete DB.records[k];for(const k in DB.turnos)if(DB.turnos[k].demo)delete DB.turnos[k];DB.demoLoaded=false;save();render();});}
@@ -520,10 +531,111 @@ function loadDemo(){
   DB.demoLoaded=true;
 }
 
+/* ===================== BASE COMPARTIDA (modo servidor) ===================== */
+let CLAVE=null,ROL=null,SNAP=null,syncT=null,syncBusy=false,syncAgain=false,syncErr='';
+function showSt(){const e=$('#syncst');if(!e)return;
+  if(syncErr){e.textContent='⚠ Sin guardar: '+syncErr;e.style.color='#C0392B';}
+  else if(syncBusy||syncT){e.textContent='Guardando…';e.style.color='#F28C28';}
+  else{e.textContent='✔ Guardado en la base compartida';e.style.color='#177a50';}}
+async function api(path,method,body){
+  const r=await fetch(API_URL+path,{method:method||'GET',headers:{'content-type':'application/json','x-clave':CLAVE||''},body:body===undefined?undefined:JSON.stringify(body)});
+  let j=null;try{j=await r.json();}catch(e){}
+  if(!r.ok){const er=new Error((j&&j.error)||('HTTP '+r.status));er.status=r.status;throw er;}return j;}
+const m2id=std=>{const m=DB.machines.find(x=>x.std===std);return m?m.id:null;};
+function mapBoot(b){
+  const id2std={};
+  DB.machines=b.maquinas.map(m=>{id2std[m.id]=m.codigo_std;return{id:m.id,nombre:m.nombre,std:m.codigo_std,estado:m.estado_default,nota:m.nota||''};});
+  DB.cats=b.categorias.map(c=>{const o=SEED_CATS.find(x=>x.id===c.id);return{id:c.id,name:c.nombre,color:o?o.color:'#7B8794'};});
+  DB.causes={};b.categorias.forEach(c=>DB.causes[c.id]=[]);b.causas.forEach(x=>(DB.causes[x.categoria_id]=DB.causes[x.categoria_id]||[]).push(x.nombre));
+  DB.standards=b.estandares.map(e=>({id:String(e.id),modelo:(e.modelos||[]).join(' / '),codigo:e.codigo,op:e.op,maq:id2std[e.maquina_id],comp:e.comp||'',opn:e.opn||'',ppu:null,fecha:null,validado:!!e.validado,stdAlt:e.std_alt==null?null:+e.std_alt,std:+e.std,estado:e.estado,src:e.fuente}));
+  if(b.config&&b.config.cfg)DB.cfg=Object.assign(fresh().cfg,b.config.cfg);
+}
+function mapRegs(r){
+  const sd=id=>DB.standards.find(x=>x.id===String(id))||{};
+  DB.records={};DB.turnos={};
+  for(const x of r.registros){
+    DB.records[key(x.fecha,x.turno,x.maquina_id)]={estado:x.estado,
+      prod:x.tramos.map(t=>{const s=t.estandar_id?sd(t.estandar_id):{};return{stdId:t.estandar_id?String(t.estandar_id):'',pieza:t.pieza_manual||s.comp||'',codigo:t.codigo_manual||s.codigo||'',op:t.op_manual||s.op||'',std:+t.std_snapshot,manual:!t.estandar_id&&!!t.pieza_manual,ini:t.hora_ini||'',fin:t.hora_fin||'',min:+t.minutos,golpes:+t.golpes,malas:+t.piezas_scrap,obs:t.obs||''};}),
+      paradas:x.paradas.map(q=>({cat:q.categoria_id,causa:q.causa||'',ini:q.hora_ini||'',fin:q.hora_fin||'',min:+q.minutos,obs:q.nota||''}))};}
+  for(const t of r.turnos)DB.turnos[t.fecha+'|'+t.turno]={sup:{leg:t.sup_leg||'',nom:t.sup_nom||''},cerrado:!!t.cerrado};
+}
+const J=o=>JSON.stringify(o);
+function snapAll(){SNAP={recs:{},turnos:{},stds:{},maqs:{},causes:{},cfg:J(DB.cfg)};
+  for(const k in DB.records)SNAP.recs[k]=J(DB.records[k]);for(const k in DB.turnos)SNAP.turnos[k]=J(DB.turnos[k]);
+  for(const x of DB.standards)SNAP.stds[x.id]=J(x);for(const m of DB.machines)SNAP.maqs[m.id]=J(m);
+  for(const c in DB.causes)SNAP.causes[c]=J(DB.causes[c]);}
+function stdBody(s){return{std:+s.std||0,std_alt:s.stdAlt==null?null:+s.stdAlt,validado:!!s.validado,estado:s.estado,maquina_id:m2id(s.maq),codigo:s.codigo,op:s.op,comp:s.comp,opn:s.opn,modelo:s.modelo};}
+function recBody(k,r){const [fecha,turno,maquina_id]=k.split('|');
+  return{fecha,turno,maquina_id,estado:r.estado,
+    tramos:r.prod.map(p=>{const sid=/^\d+$/.test(String(p.stdId||''))?+p.stdId:null;return{estandar_id:sid,std_snapshot:+p.std||0,minutos:+p.min||0,golpes:+p.golpes||0,piezas_scrap:+p.malas||0,hora_ini:p.ini||null,hora_fin:p.fin||null,obs:p.obs||null,pieza_manual:sid?null:(p.pieza||null),codigo_manual:sid?null:(p.codigo||null),op_manual:sid?null:(p.op||null)};}),
+    paradas:r.paradas.map(q=>({categoria_id:q.cat,causa:q.causa||null,minutos:+q.min||0,nota:q.obs||null,hora_ini:q.ini||null,hora_fin:q.fin||null}))};}
+function schedSync(){clearTimeout(syncT);syncT=setTimeout(()=>{syncT=null;runSync();},1200);syncErr='';showSt();
+  window.onbeforeunload=()=>'Hay cambios sin guardar';}
+function syncNow(){clearTimeout(syncT);syncT=null;runSync();}
+async function runSync(){
+  if(!SNAP)return;if(syncBusy){syncAgain=true;return;}syncBusy=true;syncErr='';showSt();
+  const ing=ROL==='ing';
+  try{
+    if(ing){
+      if(J(DB.cfg)!==SNAP.cfg){await api('/config/cfg','PUT',DB.cfg);SNAP.cfg=J(DB.cfg);}
+      for(const c in DB.causes){const sj=J(DB.causes[c]);if(sj!==SNAP.causes[c]){await api('/causas/sync','PUT',{categoria_id:c,nombres:DB.causes[c]});SNAP.causes[c]=sj;}}
+      for(const m of DB.machines){const sj=J(m);if(sj!==SNAP.maqs[m.id]){await api('/maquinas/'+m.id,'PUT',{nombre:m.nombre,codigo_std:m.std,estado_default:m.estado,nota:m.nota});SNAP.maqs[m.id]=sj;}}
+      for(const id in SNAP.stds){if(!DB.standards.some(x=>x.id===id)&&/^\d+$/.test(id)){await api('/estandares/'+id,'DELETE');delete SNAP.stds[id];}}
+      for(const s of DB.standards.slice()){
+        if(s.id[0]==='N'){if(!(s.codigo&&s.op&&+s.std>0&&m2id(s.maq)))continue;
+          const r=await api('/estandares','POST',stdBody(s));const nid=String(r.id);
+          for(const k in DB.records)for(const p of DB.records[k].prod)if(p.stdId===s.id)p.stdId=nid;
+          s.id=nid;SNAP.stds[nid]=J(s);continue;}
+        const sj=J(s);if(sj!==SNAP.stds[s.id]){await api('/estandares/'+s.id,'PUT',stdBody(s));SNAP.stds[s.id]=sj;}}
+    }
+    for(const k in DB.turnos){const sj=J(DB.turnos[k]);if(sj!==SNAP.turnos[k]){const [fecha,turno]=k.split('|'),t=DB.turnos[k];
+      await api('/turnos','PUT',{fecha,turno,sup_leg:t.sup.leg,sup_nom:t.sup.nom,cerrado:!!t.cerrado});SNAP.turnos[k]=sj;}}
+    for(const k in DB.records){const r=DB.records[k],sj=J(r);if(sj===SNAP.recs[k])continue;
+      const mm=mach(k.split('|')[2]);
+      if(SNAP.recs[k]===undefined&&!r.prod.length&&!r.paradas.length&&mm&&r.estado===mm.estado){SNAP.recs[k]=sj;continue;}
+      await api('/registros','PUT',recBody(k,r));SNAP.recs[k]=sj;}
+  }catch(e){syncErr=e.message;if(e.status===401){localStorage.removeItem('pdc.clave');showLogin('La clave ya no es válida.');}
+    if(e.status===403)syncErr='Tu clave no permite modificar eso (solo Ingeniería).';
+    setTimeout(()=>{if(syncErr&&!syncBusy)runSync();},15000);}
+  syncBusy=false;showSt();
+  if(syncAgain){syncAgain=false;schedSync();}
+  else if(!syncErr&&!syncT)window.onbeforeunload=null;
+}
+function showLogin(msg){let o=document.getElementById('login');if(o)o.remove();o=document.createElement('div');o.id='login';
+  o.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#0B2545,#1F6FA8);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px';
+  o.innerHTML=`<div class="card" style="max-width:380px;width:100%;margin:0"><h3 style="margin-top:0">Planillas de Control · UET 5</h3>
+   <p class="mut">Ingresá la clave de acceso (te la da Mejora Continua).</p>
+   <input id="clv" type="password" placeholder="Clave" style="width:100%;margin-bottom:10px" onkeydown="if(event.key==='Enter')doLogin()">
+   <div id="lgm" style="color:#C0392B;font-size:13px;min-height:18px">${esc(msg||'')}</div>
+   <button class="btn nv" style="width:100%" onclick="doLogin()">Ingresar</button></div>`;
+  document.body.appendChild(o);setTimeout(()=>{const i=$('#clv');if(i)i.focus();},50);}
+async function doLogin(){const v=$('#clv').value.trim();if(!v)return;CLAVE=v;$('#lgm').textContent='Verificando…';$('#lgm').style.color='#667085';
+  try{const w=await api('/whoami');ROL=w.rol;try{localStorage.setItem('pdc.clave',v);}catch(e){}
+    document.getElementById('login').remove();await loadAll();}
+  catch(e){CLAVE=null;$('#lgm').style.color='#C0392B';$('#lgm').textContent=e.status===401?'Clave incorrecta.':'No se pudo conectar: '+e.message;}}
+function logout(){try{localStorage.removeItem('pdc.clave');}catch(e){}location.reload();}
+async function loadAll(){
+  $('#view').innerHTML='<div class="card"><p class="mut">Cargando datos de la base compartida…</p></div>';
+  try{const d=new Date();d.setDate(d.getDate()-150);
+    const [b,r]=await Promise.all([api('/bootstrap'),api('/registros?desde='+d.toISOString().slice(0,10))]);
+    DB=fresh();DB.demoLoaded=false;mapBoot(b);mapRegs(r);snapAll();
+    UI.rf.fecha=lastDate();UI.fecha=today();render();
+  }catch(e){if(e.status===401){logout();return;}$('#view').innerHTML='<div class="card"><h3>No se pudo cargar</h3><p>'+esc(e.message)+'</p><button class="btn nv" onclick="location.reload()">Reintentar</button></div>';}}
+async function startServer(){
+  DB=fresh();DB.demoLoaded=false;renderTabs();
+  try{CLAVE=localStorage.getItem('pdc.clave');}catch(e){}
+  if(!CLAVE){showLogin();return;}
+  try{const w=await api('/whoami');ROL=w.rol;await loadAll();}
+  catch(e){if(e.status===401){try{localStorage.removeItem('pdc.clave');}catch(_){}CLAVE=null;showLogin('La clave guardada ya no es válida.');}
+    else $('#view').innerHTML='<div class="card"><h3>Sin conexión con la base</h3><p>'+esc(e.message)+'</p><button class="btn nv" onclick="location.reload()">Reintentar</button></div>';}}
+
 /* ===================== INICIO ===================== */
+if(SERVER){startServer();}
+else{
 DB=loadDB();if(!DB||!DB.v){DB=fresh();loadDemo();save();}
 UI.rf.fecha=lastDate();UI.fecha=today();
 render();
+}
 </script>
 </body>
 </html>
