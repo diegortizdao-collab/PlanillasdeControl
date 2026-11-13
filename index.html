@@ -491,7 +491,7 @@ function dataCard(){
    <button class="btn nv" onclick="dl('planillasdecontrol_backup_'+today()+'.json',JSON.stringify(DB),'application/json')">⬇ Backup (JSON)</button>
    <button class="btn or" onclick="syncNow()">🔄 Guardar ahora</button>
    <button class="btn ghost" onclick="logout()">Cerrar sesión</button></div>
-   <p class="mut">Base compartida (Neon): lo que se carga se guarda solo y lo ven todos los usuarios. Sesión: <b>${ROL==='ing'?'Ingeniería':'Carga'}</b>.</p></div></div>`;
+   <p class="mut">Base compartida (Neon): lo que se carga se guarda solo y lo ven todos los usuarios. Sesión: <b>${esc(EMAIL)}</b> · ${ROL==='ing'?'Procesos':'Carga'}.</p></div></div>`;
   return `<div class="card"><h3>Datos</h3><div class="row">
    <button class="btn nv" onclick="dl('planillasdecontrol_backup_'+today()+'.json',JSON.stringify(DB),'application/json')">⬇ Backup (JSON)</button>
    <label class="btn ok" style="cursor:pointer">⬆ Restaurar backup<input type="file" accept=".json" style="display:none" onchange="restore(this)"></label>
@@ -532,13 +532,13 @@ function loadDemo(){
 }
 
 /* ===================== BASE COMPARTIDA (modo servidor) ===================== */
-let CLAVE=null,ROL=null,SNAP=null,syncT=null,syncBusy=false,syncAgain=false,syncErr='';
+let CLAVE=null,EMAIL=null,ROL=null,SNAP=null,syncT=null,syncBusy=false,syncAgain=false,syncErr='';
 function showSt(){const e=$('#syncst');if(!e)return;
   if(syncErr){e.textContent='⚠ Sin guardar: '+syncErr;e.style.color='#C0392B';}
   else if(syncBusy||syncT){e.textContent='Guardando…';e.style.color='#F28C28';}
   else{e.textContent='✔ Guardado en la base compartida';e.style.color='#177a50';}}
 async function api(path,method,body){
-  const r=await fetch(API_URL+path,{method:method||'GET',headers:{'content-type':'application/json','x-clave':CLAVE||''},body:body===undefined?undefined:JSON.stringify(body)});
+  const r=await fetch(API_URL+path,{method:method||'GET',headers:{'content-type':'application/json','x-clave':CLAVE||'','x-email':encodeURIComponent(EMAIL||'')},body:body===undefined?undefined:JSON.stringify(body)});
   let j=null;try{j=await r.json();}catch(e){}
   if(!r.ok){const er=new Error((j&&j.error)||('HTTP '+r.status));er.status=r.status;throw er;}return j;}
 const m2id=std=>{const m=DB.machines.find(x=>x.std===std);return m?m.id:null;};
@@ -604,15 +604,16 @@ async function runSync(){
 function showLogin(msg){let o=document.getElementById('login');if(o)o.remove();o=document.createElement('div');o.id='login';
   o.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#0B2545,#1F6FA8);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px';
   o.innerHTML=`<div class="card" style="max-width:380px;width:100%;margin:0"><h3 style="margin-top:0">Planillas de Control · UET 5</h3>
-   <p class="mut">Ingresá la clave de acceso (te la da Mejora Continua).</p>
+   <p class="mut">Ingresá con tu email de Escorial y la clave de acceso.</p>
+   <input id="eml" type="email" placeholder="usuario@escorial.com.ar" value="${esc(EMAIL||'')}" style="width:100%;margin-bottom:8px" onkeydown="if(event.key==='Enter')$('#clv').focus()">
    <input id="clv" type="password" placeholder="Clave" style="width:100%;margin-bottom:10px" onkeydown="if(event.key==='Enter')doLogin()">
    <div id="lgm" style="color:#C0392B;font-size:13px;min-height:18px">${esc(msg||'')}</div>
    <button class="btn nv" style="width:100%" onclick="doLogin()">Ingresar</button></div>`;
-  document.body.appendChild(o);setTimeout(()=>{const i=$('#clv');if(i)i.focus();},50);}
-async function doLogin(){const v=$('#clv').value.trim();if(!v)return;CLAVE=v;$('#lgm').textContent='Verificando…';$('#lgm').style.color='#667085';
-  try{const w=await api('/whoami');ROL=w.rol;try{localStorage.setItem('pdc.clave',v);}catch(e){}
+  document.body.appendChild(o);setTimeout(()=>{const i=$(EMAIL?'#clv':'#eml');if(i)i.focus();},50);}
+async function doLogin(){const v=$('#clv').value.trim(),em=$('#eml').value.trim().toLowerCase();if(!v||!em)return;CLAVE=v;EMAIL=em;$('#lgm').textContent='Verificando…';$('#lgm').style.color='#667085';
+  try{const w=await api('/whoami');ROL=w.rol;try{localStorage.setItem('pdc.clave',v);localStorage.setItem('pdc.email',em);}catch(e){}
     document.getElementById('login').remove();await loadAll();}
-  catch(e){CLAVE=null;$('#lgm').style.color='#C0392B';$('#lgm').textContent=e.status===401?'Clave incorrecta.':'No se pudo conectar: '+e.message;}}
+  catch(e){CLAVE=null;$('#lgm').style.color='#C0392B';$('#lgm').textContent=e.status===401?'Email o clave incorrectos (o tu email no está habilitado).':'No se pudo conectar: '+e.message;}}
 function logout(){try{localStorage.removeItem('pdc.clave');}catch(e){}location.reload();}
 async function loadAll(){
   $('#view').innerHTML='<div class="card"><p class="mut">Cargando datos de la base compartida…</p></div>';
@@ -623,8 +624,8 @@ async function loadAll(){
   }catch(e){if(e.status===401){logout();return;}$('#view').innerHTML='<div class="card"><h3>No se pudo cargar</h3><p>'+esc(e.message)+'</p><button class="btn nv" onclick="location.reload()">Reintentar</button></div>';}}
 async function startServer(){
   DB=fresh();DB.demoLoaded=false;renderTabs();
-  try{CLAVE=localStorage.getItem('pdc.clave');}catch(e){}
-  if(!CLAVE){showLogin();return;}
+  try{CLAVE=localStorage.getItem('pdc.clave');EMAIL=localStorage.getItem('pdc.email');}catch(e){}
+  if(!CLAVE||!EMAIL){showLogin();return;}
   try{const w=await api('/whoami');ROL=w.rol;await loadAll();}
   catch(e){if(e.status===401){try{localStorage.removeItem('pdc.clave');}catch(_){}CLAVE=null;showLogin('La clave guardada ya no es válida.');}
     else $('#view').innerHTML='<div class="card"><h3>Sin conexión con la base</h3><p>'+esc(e.message)+'</p><button class="btn nv" onclick="location.reload()">Reintentar</button></div>';}}
