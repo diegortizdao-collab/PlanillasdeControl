@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planillas de Control · UET 5 · Escorial</title>
+<style>
+:root{--navy:#0B2545;--navy2:#13315C;--orange:#F28C28;--sky:#2E9BD6;--sky2:#8DC9EE;--bg:#EEF3F8;--card:#fff;--ink:#14213D;--mut:#667085;--line:#D8E1EB;--ok:#22A06B;--warn:#F2A93B;--bad:#E5484D;--vio:#8E4EC6}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{background:var(--navy);border-top:5px solid var(--orange);color:#fff;padding:10px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo b{font-size:26px;letter-spacing:.5px;font-weight:700;text-transform:lowercase}
+.badge-spe{background:var(--sky);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;letter-spacing:.4px}
+header .sub{margin-left:auto;text-align:right;font-size:12px;color:var(--sky2);line-height:1.35}
+header .sub strong{color:#fff;font-size:14px}
+nav{background:var(--navy2);display:flex;gap:4px;padding:6px 18px 0;flex-wrap:wrap}
+nav button{background:transparent;border:0;color:#BFD3EA;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;border-radius:8px 8px 0 0}
+nav button.on{background:var(--bg);color:var(--navy)}
+nav button:hover:not(.on){color:#fff}
+main{padding:18px 22px;max-width:1500px;margin:0 auto}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:18px 10px 26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(11,37,69,.05)}
+.card h3{margin:0 0 10px;font-size:15px;color:var(--navy)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:14px}
+label.f{display:flex;flex-direction:column;font-size:11px;font-weight:700;color:var(--mut);gap:3px;text-transform:uppercase;letter-spacing:.3px}
+input,select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:0}
+input:focus,select:focus{outline:2px solid var(--sky);border-color:var(--sky)}
+input[type=number]{width:90px}input[type=time]{width:105px}
+.btn{border:0;border-radius:9px;padding:8px 14px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;background:var(--sky)}
+.btn:hover{filter:brightness(1.08)}.btn.ok{background:var(--ok)}.btn.or{background:var(--orange)}.btn.bad{background:var(--bad)}.btn.vio{background:var(--vio)}.btn.nv{background:var(--navy2)}.btn.ghost{background:#E7EEF6;color:var(--navy)}.btn.sm{padding:4px 9px;font-size:12px}
+table{border-collapse:collapse;width:100%}
+th{background:#E7EEF6;color:var(--navy);font-size:11px;text-transform:uppercase;letter-spacing:.3px;text-align:left;padding:7px 6px;position:sticky;top:0;white-space:nowrap}
+td{padding:4px 6px;border-bottom:1px solid #EDF1F6;vertical-align:middle}
+td input,td select{width:100%;padding:5px 6px}
+td input[type=number]{width:84px}td input[type=time]{width:122px}
+tr.conf td{background:#FFF4E5}tr.val td{background:#EAF8F1}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;white-space:nowrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:2px solid var(--line);background:#fff;border-radius:10px;padding:7px 11px;cursor:pointer;font-weight:700;font-size:13px;display:flex;gap:7px;align-items:center}
+.chip.sel{border-color:var(--sky);box-shadow:0 0 0 3px rgba(46,155,214,.2)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.sumbar{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
+.sum{background:#F4F8FC;border-radius:10px;padding:8px 12px;min-width:110px}
+.sum small{display:block;color:var(--mut);font-size:11px;font-weight:700;text-transform:uppercase}.sum b{font-size:19px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.kpi{border-radius:12px;padding:12px 14px;color:#fff}
+.kpi small{display:block;font-size:11px;font-weight:700;text-transform:uppercase;opacity:.92}.kpi b{font-size:30px;line-height:1.15}.kpi span{font-size:12px;opacity:.95;display:block}
+.banner{background:#FFF4E5;border:1px solid #F7C98B;color:#8A4B00;border-radius:10px;padding:9px 14px;margin-bottom:12px;font-weight:600;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner.red{background:#FDECEC;border-color:#F3B1B3;color:#9B1C20}
+.mut{color:var(--mut)}.r{text-align:right}.c{text-align:center}
+.msg{background:#F4F8FC;border-left:5px solid var(--sky);padding:10px 14px;border-radius:8px;line-height:1.55}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;font-weight:600}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.sub2{display:flex;gap:6px;margin-bottom:10px}
+.sub2 button{border:0;background:#E7EEF6;color:var(--navy);padding:7px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+.sub2 button.on{background:var(--navy2);color:#fff}
+svg text{font-family:inherit}
+.scroll{max-height:62vh;overflow:auto;border:1px solid var(--line);border-radius:10px}
+@media print{header,nav,footer,.noprint{display:none!important}body{background:#fff}main{padding:0}.card{box-shadow:none;break-inside:avoid}@page{size:A4 landscape;margin:10mm}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg width="38" height="38" viewBox="0 0 38 38"><rect width="38" height="38" rx="8" fill="#F28C28"/><path d="M10 12h18M10 19h18M10 26h18" stroke="#0B2545" stroke-width="4" stroke-linecap="round"/></svg>
+    <b>escorial</b><span class="badge-spe">SPE — Sistema de Producción Escorial</span>
+  </div>
+  <div class="sub"><strong>Planillas de Control · UET 5</strong><br>Escorial Suipacha · Prensas</div>
+</header>
+<nav id="tabs"></nav>
+<main id="view"></main>
+<footer>Desarrollado por Mgter. Diego Ortiz — Líder de Mejora Continua | Consultor ISO</footer>
+
+<script>
+/* ===================== DATOS BASE ===================== */
+const SEED_STD = __SEED_STD__;
+const SEED_MACH = [
+ {id:'EP04',nombre:'Prensa 04',std:'E-P04',estado:'OPERA',nota:''},
+ {id:'EP24',nombre:'Prensa 24',std:'E-P24',estado:'OPERA',nota:''},
+ {id:'EP25',nombre:'Prensa 25',std:'E-P25',estado:'OPERA',nota:''},
+ {id:'EP26',nombre:'Prensa 26',std:'E-P26',estado:'OPERA',nota:''},
+ {id:'EP18',nombre:'Prensa 18',std:'E-P18',estado:'FS',nota:'Fuera de servicio (62 turnos así en la base de pérdidas)'},
+ {id:'EB22',nombre:'E-B22',std:'E-B22',estado:'OPERA',nota:''},
+ {id:'EB16',nombre:'E-16',std:'E-16',estado:'OPERA',nota:'Equivalencia EB16 ↔ E-16 a confirmar'},
+ {id:'LC04',nombre:'LC-04',std:'LC-04',estado:'OPERA',nota:''},
+ {id:'LC06',nombre:'LC-06 + LC-08',std:'LC-06+LC-08',estado:'OPERA',nota:'En Pérdidas figura LC06; el estándar es LC-06+LC-08'},
+ {id:'LASER',nombre:'Láser',std:'LSR-01',estado:'OPERA',nota:'Equivalencia LASER ↔ LSR-01 a confirmar'},
+ {id:'OMERA',nombre:'Omera',std:'TRM-07',estado:'OPERA',nota:'Equivalencia OMERA ↔ TRM-07 a confirmar'}
+];
+const SEED_CATS = [
+ {id:'MANT',name:'Mantenimiento',color:'#E5484D'},
+ {id:'FOP',name:'Falta de operario',color:'#8E4EC6'},
+ {id:'SETUP',name:'Setup',color:'#2E9BD6'},
+ {id:'MATR',name:'Matricería',color:'#F28C28'},
+ {id:'ESP',name:'Esperas / logística',color:'#22A06B'},
+ {id:'OTRA',name:'Otras',color:'#7B8794'}
+];
+const SEED_CAUSES = {
+ MANT:['Falla eléctrica / sensor / encoder','Falla hidráulica (aceite, mangas, bomba)','Falla neumática (pérdida de aire)','Falla de corte / punzonado','Falla de alimentador','Rotura de rodamiento / mecánica','Rotura de punzón','Regulación de parámetros / presión','Otra falla de mantenimiento'],
+ FOP:['Falta de operario / personal','Capacitación de operario nuevo'],
+ SETUP:['Cambio de matriz','Cambio de dispositivo','Carga de bobina / fleje','Puesta a punto','Cambio de tacho de scrap / limpieza'],
+ MATR:['Matriz en reparación','Espera de cambio de modelo / matriz','Falla en cortante'],
+ ESP:['Falta de material','Espera de autoelevador','Espera de puente grúa','Espera de calidad','Falta de capachos / racks','Falta de planificación','Reunión / capacitación'],
+ OTRA:['Otra causa (detallar)']
+};
+const TURNOS = ['MAÑANA','TARDE'];
+
+/* ===================== ESTADO / PERSISTENCIA ===================== */
+const LS = 'planillasdecontrol.v1';
+let DB, mem = null;
+const clone = o => JSON.parse(JSON.stringify(o));
+function fresh(){return {v:1,cfg:{carga:{'MAÑANA':485,'TARDE':485},horario:{'MAÑANA':['06:00','15:00'],'TARDE':['14:30','23:30']},metas:{oa:90,rend:95,cal:98}},
+  machines:clone(SEED_MACH),standards:clone(SEED_STD),cats:clone(SEED_CATS),causes:clone(SEED_CAUSES),records:{},turnos:{},demoLoaded:false};}
+function loadDB(){try{const s=localStorage.getItem(LS);if(s)return JSON.parse(s);}catch(e){}return mem;}
+function save(){mem=DB;try{localStorage.setItem(LS,JSON.stringify(DB));}catch(e){}}
+const UI = {tab:'carga',sub:'std',fecha:null,turno:'MAÑANA',maq:null,rf:{fecha:null,turno:'',maq:'',rango:'14'},sf:{maq:'',estado:'',q:''}};
+
+/* ===================== UTILIDADES ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = (n,d=0)=>n==null||isNaN(n)?'—':Number(n).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct = (n,d=1)=>n==null||isNaN(n)?'—':nf(n*100,d)+' %';
+const toMin = t=>{if(!t)return null;const [h,m]=t.split(':').map(Number);return h*60+m;};
+const diffMin = (a,b)=>{const x=toMin(a),y=toMin(b);if(x==null||y==null)return null;let d=y-x;if(d<0)d+=1440;return d;};
+const today = ()=>new Date().toISOString().slice(0,10);
+const catOf = id=>DB.cats.find(c=>c.id===id)||{name:id,color:'#7B8794'};
+const mach = id=>DB.machines.find(m=>m.id===id);
+const key = (f,t,m)=>`${f}|${t}|${m}`;
+function sem(v,meta){if(v==null||isNaN(v))return '#9AA7B5';const x=v*100;return x>=meta?'#22A06B':x>=meta-10?'#F2A93B':'#E5484D';}
+function modal(html,btns){let o=document.getElementById('ov');if(o)o.remove();o=document.createElement('div');o.id='ov';o.style.cssText='position:fixed;inset:0;background:rgba(11,37,69,.55);display:flex;align-items:center;justify-content:center;z-index:99;padding:16px';
+  o.innerHTML='<div style="background:#fff;border-radius:14px;max-width:520px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.35)"><div style="line-height:1.55">'+html+'</div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px" id="ovb"></div></div>';
+  document.body.appendChild(o);const b=o.querySelector('#ovb');btns.forEach(([t,cls,fn])=>{const e=document.createElement('button');e.className='btn '+cls;e.textContent=t;e.onclick=()=>{o.remove();if(fn)fn();};b.appendChild(e);});}
+function info(html){modal(html,[['Entendido','','']]);}
+function ask(html,yes){modal(html,[['Cancelar','ghost',null],['Sí, continuar','bad',yes]]);}
+function uid(){return 'n'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+/* ===================== CÁLCULOS ===================== */
+function calc(rec,turno){
+  const opera = rec.estado==='OPERA';
+  const a = {carga:opera?(+DB.cfg.carga[turno]||0):0,prod:0,golpes:0,golpesStd:0,teor:0,malas:0,sinStd:0,par:{},pt:0,causas:{}};
+  for(const p of rec.prod){const m=+p.min||0,g=+p.golpes||0;a.prod+=m;a.golpes+=g;a.malas+=(+p.malas||0);
+    if(+p.std>0){a.teor+=m*p.std/60;a.golpesStd+=g;}else a.sinStd+=m;}
+  for(const q of rec.paradas){const m=+q.min||0;a.par[q.cat]=(a.par[q.cat]||0)+m;a.pt+=m;
+    const k=q.cat+'|'+(q.causa||'Sin detallar');a.causas[k]=(a.causas[k]||0)+m;}
+  return a;
+}
+function addAgg(t,a){
+  for(const k of ['carga','prod','golpes','golpesStd','teor','malas','sinStd','pt'])t[k]=(t[k]||0)+a[k];
+  t.par=t.par||{};t.causas=t.causas||{};
+  for(const k in a.par)t.par[k]=(t.par[k]||0)+a.par[k];
+  for(const k in a.causas)t.causas[k]=(t.causas[k]||0)+a.causas[k];
+  return t;
+}
+function metrics(a){
+  const disp=a.carga>0?a.prod/a.carga:null;
+  const rend=a.teor>0?a.golpesStd/a.teor:null;
+  const cal=a.golpes>0?(a.golpes-a.malas)/a.golpes:null;
+  const oa=disp!=null&&rend!=null?disp*rend:null;
+  const oee=oa!=null&&cal!=null?oa*cal:null;
+  return {disp,rend,cal,oa,oee,sinReg:Math.max(0,a.carga-a.prod-a.pt)};
+}
+function recsWhere(f){const out=[];for(const k in DB.records){const [fecha,turno,maq]=k.split('|');if(f(fecha,turno,maq))out.push({fecha,turno,maq,rec:DB.records[k]});}return out;}
+function aggRecs(list){const t={};for(const r of list)addAgg(t,calc(r.rec,r.turno));if(!t.carga&&t.carga!==0){Object.assign(t,{carga:0,prod:0,golpes:0,golpesStd:0,teor:0,malas:0,sinStd:0,pt:0,par:{},causas:{}});}return t;}
+function lastDate(){let m='';for(const k in DB.records){const f=k.split('|')[0];if(f>m)m=f;}return m||today();}
+function getRec(f,t,m){const k=key(f,t,m);if(!DB.records[k]){const mm=mach(m);DB.records[k]={estado:mm?mm.estado:'OPERA',prod:[],paradas:[]};}return DB.records[k];}
+
+/* ===================== GRÁFICOS SVG ===================== */
+const W=560;
+function axisTicks(max,n=4){const step=Math.pow(10,Math.floor(Math.log10(max/n||1)));let s=step;for(const m of [1,2,2.5,5,10]){if(max/(step*m)<=n){s=step*m;break;}}const t=[];for(let v=0;v<=max+s*0.01;v+=s)t.push(v);return t;}
+function svgBars(labels,series,{h=300,unit=''}={}){
+  const L=54,R=12,T=18,B=64,iw=W-L-R,ih=h-T-B;
+  const max=Math.max(1,...series.flatMap(s=>s.vals.map(v=>v||0)));const ticks=axisTicks(max*1.1);const ymax=ticks[ticks.length-1];
+  const gw=iw/Math.max(1,labels.length),bw=Math.min(34,gw/(series.length+0.6));
+  let g=ticks.map(v=>{const y=T+ih-v/ymax*ih;return `<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#E3EAF2"/><text x="${L-6}" y="${y+4}" font-size="11" text-anchor="end" fill="#667085">${nf(v)}</text>`;}).join('');
+  labels.forEach((lb,i)=>{const cx=L+gw*i+gw/2;
+    series.forEach((s,j)=>{const v=s.vals[i]||0,bh=v/ymax*ih,x=cx-(series.length*bw)/2+j*bw,y=T+ih-bh;
+      g+=`<rect x="${x}" y="${y}" width="${bw-2}" height="${bh}" rx="3" fill="${Array.isArray(s.color)?s.color[i]:s.color}"/>`;
+      if(v>0&&j===series.length-1)g+=`<text x="${x+(bw-2)/2}" y="${y-4}" font-size="10.5" font-weight="700" text-anchor="middle" fill="#14213D">${nf(v)}</text>`;});
+    g+=`<text transform="translate(${cx},${T+ih+14}) rotate(-35)" font-size="11" text-anchor="end" fill="#344054" font-weight="600">${esc(lb)}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${h}" width="100%">${g}</svg>`;
+}
+function svgHBars(items,{max=120}={}){
+  const rh=26,L=96,R=50,h=items.length*rh+10,iw=W-L-R;
+  let g='';const ticks=[0,25,50,75,100];
+  items.forEach((it,i)=>{const y=6+i*rh;
+    g+=`<text x="${L-8}" y="${y+14}" font-size="12" text-anchor="end" font-weight="600" fill="#344054">${esc(it.label)}</text>`;
+    g+=`<rect x="${L}" y="${y+2}" width="${iw}" height="16" rx="4" fill="#EEF3F8"/>`;
+    if(it.val!=null)g+=`<rect x="${L}" y="${y+2}" width="${Math.max(2,Math.min(iw,(it.val*100/max)*iw))}" height="16" rx="4" fill="${it.color}"/>`;
+    g+=`<text x="${W-R+6}" y="${y+15}" font-size="12" font-weight="700" fill="#14213D">${it.val==null?'—':nf(it.val*100,0)+'%'}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${h}" width="100%">${g}</svg>`;
+}
+function svgDonut(items){
+  const tot=items.reduce((s,i)=>s+i.val,0);const cx=130,cy=120,r=95,r2=56;
+  if(!tot)return '<p class="mut">Sin paradas registradas.</p>';
+  let a0=-Math.PI/2,g='';
+  items.forEach(it=>{const a1=a0+it.val/tot*2*Math.PI,lg=a1-a0>Math.PI?1:0;
+    const p=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+    const [x0,y0]=p(r,a0),[x1,y1]=p(r,a1),[x2,y2]=p(r2,a1),[x3,y3]=p(r2,a0);
+    if(it.val/tot>0.9999)g+=`<circle cx="${cx}" cy="${cy}" r="${(r+r2)/2}" fill="none" stroke="${it.color}" stroke-width="${r-r2}"/>`;
+    else g+=`<path d="M${x0} ${y0}A${r} ${r} 0 ${lg} 1 ${x1} ${y1}L${x2} ${y2}A${r2} ${r2} 0 ${lg} 0 ${x3} ${y3}Z" fill="${it.color}"/>`;
+    const am=(a0+a1)/2;if(it.val/tot>0.06){const [tx,ty]=p((r+r2)/2,am);g+=`<text x="${tx}" y="${ty+4}" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">${nf(it.val/tot*100,0)}%</text>`;}
+    a0=a1;});
+  g+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="20" font-weight="700" fill="#14213D">${nf(tot)}</text><text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="11" fill="#667085">min parados</text>`;
+  const leg=items.map((it,i)=>`<g transform="translate(262,${46+i*26})"><rect width="13" height="13" rx="3" fill="${it.color}"/><text x="20" y="11" font-size="12" font-weight="600" fill="#344054">${esc(it.label)} · ${nf(it.val)}</text></g>`).join('');
+  return `<svg viewBox="0 0 ${W} 250" width="100%">${g}${leg}</svg>`;
+}
+function svgPareto(items){
+  if(!items.length)return '<p class="mut">Sin causas registradas.</p>';
+  const h=340,L=70,R=44,T=16,B=130,iw=W-L-R,ih=h-T-B;const tot=items.reduce((s,i)=>s+i.val,0),max=items[0].val*1.1;
+  let acc=0,g='',pts=[];const bw=iw/items.length;
+  [0,.25,.5,.75,1].forEach(f=>{const y=T+ih-f*ih;g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#E3EAF2"/><text x="${W-R+6}" y="${y+4}" font-size="10.5" fill="#667085">${f*100}%</text>`;});
+  items.forEach((it,i)=>{const bh=it.val/max*ih,x=L+bw*i+bw*.15,y=T+ih-bh;acc+=it.val;
+    g+=`<rect x="${x}" y="${y}" width="${bw*.7}" height="${bh}" rx="3" fill="${it.color}"/><text x="${x+bw*.35}" y="${y-4}" font-size="10.5" font-weight="700" text-anchor="middle">${nf(it.val)}</text>`;
+    pts.push([x+bw*.35,T+ih-acc/tot*ih]);
+    g+=`<text transform="translate(${x+bw*.35},${T+ih+12}) rotate(-50)" font-size="10.5" font-weight="600" text-anchor="end" fill="#344054">${esc(it.label.length>30?it.label.slice(0,29)+'…':it.label)}</text>`;});
+  g+=`<line x1="${L}" x2="${W-R}" y1="${T+ih-.8*ih}" y2="${T+ih-.8*ih}" stroke="#E5484D" stroke-dasharray="5 4"/>`;
+  g+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#14213D" stroke-width="2.2"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#14213D"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${h}" width="100%">${g}</svg>`;
+}
+function svgTrend(points,meta,title){
+  if(!points.length)return '<p class="mut">Sin datos en el período.</p>';
+  const h=290,L=44,R=14,T=18,B=52,iw=W-L-R,ih=h-T-B;const ymax=Math.max(110,Math.ceil(Math.max(...points.map(p=>p.val==null?0:p.val*100))/10)*10+5);
+  const Y=v=>T+ih-v/ymax*ih;let g='';
+  g+=`<rect x="${L}" y="${Y(meta-10)}" width="${iw}" height="${Y(0)-Y(meta-10)}" fill="#E5484D" opacity=".16"/><rect x="${L}" y="${Y(meta)}" width="${iw}" height="${Y(meta-10)-Y(meta)}" fill="#F2A93B" opacity=".22"/><rect x="${L}" y="${Y(ymax)}" width="${iw}" height="${Y(meta)-Y(ymax)}" fill="#22A06B" opacity=".16"/>`;
+  g+=`<line x1="${L}" x2="${W-R}" y1="${Y(meta)}" y2="${Y(meta)}" stroke="#22A06B" stroke-width="1.6" stroke-dasharray="6 4"/><text x="${W-R}" y="${Y(meta)-4}" font-size="11" font-weight="700" fill="#177a50" text-anchor="end">meta ${meta}%</text>`;
+  [0,25,50,75,100].filter(v=>v<=ymax).forEach(v=>g+=`<text x="${L-6}" y="${Y(v)+4}" font-size="11" fill="#667085" text-anchor="end">${v}</text>`);
+  const bw=iw/points.length;let line=[];
+  points.forEach((p,i)=>{const x=L+bw*i+bw/2;g+=`<text x="${x}" y="${h-B+16}" font-size="11" font-weight="600" text-anchor="middle" fill="#344054">${esc(p.label)}</text>`;
+    if(p.val!=null){const y=Y(p.val*100);line.push([x,y]);g+=`<circle cx="${x}" cy="${y}" r="5" fill="${sem(p.val,meta)}" stroke="#fff" stroke-width="1.5"/><text x="${x}" y="${y-9}" font-size="11" font-weight="700" text-anchor="middle" fill="#14213D">${nf(p.val*100,0)}</text>`;}});
+  if(line.length>1)g=g.replace(/(<circle)/,`<polyline points="${line.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#0B2545" stroke-width="2.2"/>$1`);
+  return `<svg viewBox="0 0 ${W} ${h}" width="100%">${g}</svg>`;
+}
+function svgRadar(axes){
+  const cx=W/2,cy=170,r=100,n=axes.length;const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return [cx+r*v*Math.cos(a),cy+r*v*Math.sin(a)];};
+  let g='';[.25,.5,.75,1].forEach(f=>g+=`<polygon points="${axes.map((_,i)=>pt(i,f).join(',')).join(' ')}" fill="none" stroke="#D8E1EB"/>`);
+  axes.forEach((a,i)=>{const [x,y]=pt(i,1);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#D8E1EB"/>`;const [lx,ly]=pt(i,1.3);g+=`<text x="${lx}" y="${ly}" font-size="12" font-weight="700" text-anchor="middle" fill="#344054">${a.label}</text><text x="${lx}" y="${ly+15}" font-size="14" font-weight="800" text-anchor="middle" fill="#0B2545">${a.val==null?'—':nf(a.val*100,0)+'%'}</text>`;});
+  g+=`<polygon points="${axes.map((a,i)=>pt(i,a.meta/100).join(',')).join(' ')}" fill="#22A06B" fill-opacity=".12" stroke="#22A06B" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+  g+=`<polygon points="${axes.map((a,i)=>pt(i,Math.min(1.05,a.val||0)).join(',')).join(' ')}" fill="#2E9BD6" fill-opacity=".35" stroke="#0B2545" stroke-width="2.2"/>`;
+  axes.forEach((a,i)=>{const [x,y]=pt(i,Math.min(1.05,a.val||0));g+=`<circle cx="${x}" cy="${y}" r="4.5" fill="#0B2545"/>`;});
+  return `<svg viewBox="0 0 ${W} 330" width="100%">${g}</svg><div class="legend" style="justify-content:center"><span><i style="background:#2E9BD6"></i>Real</span><span><i style="background:#22A06B"></i>Meta (línea punteada)</span></div>`;
+}
+
+/* ===================== VISTAS ===================== */
+const TABS=[['carga','📋 Carga de cierre'],['informe','📊 Informe diario'],['maestro','🛠 Ingeniería · Maestro'],['config','⚙ Configuración']];
+function renderTabs(){$('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${UI.tab===k?'on':''}" onclick="go('${k}')">${l}</button>`).join('');}
+function go(t){UI.tab=t;render();}
+function render(){renderTabs();const v=$('#view');
+  ({carga:viewCarga,informe:viewInforme,maestro:viewMaestro,config:viewConfig})[UI.tab](v);window.scrollTo(0,0);}
+function demoBanner(){return DB.demoLoaded?`<div class="banner noprint">🧪 Hay <b>datos de demostración simulados</b> cargados (no son datos reales de planta). <button class="btn sm bad" onclick="clearDemo()">Borrar datos de demo</button></div>`:'';}
+
+/* ---------- CARGA ---------- */
+function viewCarga(v){
+  if(!UI.fecha)UI.fecha=today();
+  if(!UI.maq)UI.maq=DB.machines.find(m=>m.estado==='OPERA').id;
+  const tk=UI.fecha+'|'+UI.turno;DB.turnos[tk]=DB.turnos[tk]||{sup:{leg:'',nom:''},cerrado:false};const T=DB.turnos[tk];
+  const hor=DB.cfg.horario[UI.turno];
+  v.innerHTML=demoBanner()+`
+  <div class="card"><div class="row">
+    <label class="f">Fecha<input type="date" value="${UI.fecha}" onchange="UI.fecha=this.value;render()"></label>
+    <label class="f">Turno<select onchange="UI.turno=this.value;render()">${TURNOS.map(t=>`<option ${t===UI.turno?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="f">Legajo supervisor *<input style="width:110px" value="${esc(T.sup.leg)}" oninput="supSet('leg',this.value)"></label>
+    <label class="f">Nombre y apellido *<input style="width:230px" value="${esc(T.sup.nom)}" oninput="supSet('nom',this.value)"></label>
+    <div class="mut" style="padding-bottom:8px">Horario ${hor[0]}–${hor[1]} · carga ${DB.cfg.carga[UI.turno]} min netos</div>
+    <div style="margin-left:auto;display:flex;gap:8px"><button class="btn ok" onclick="cerrarTurno()">✔ Cerrar turno</button><button class="btn or" onclick="go('informe');UI.rf.fecha=UI.fecha">📊 Ver informe</button></div>
+  </div>${T.cerrado?'<div class="banner" style="margin:10px 0 0">🔒 Turno marcado como cerrado. Se puede seguir editando.</div>':''}</div>
+  <div class="card"><h3>Máquinas del turno <span class="mut" style="font-weight:400">— tocá una para cargar</span></h3><div class="chips" id="chips"></div></div>
+  <div id="panel"></div>`;
+  renderChips();renderPanel();
+}
+function supSet(k,val){const T=DB.turnos[UI.fecha+'|'+UI.turno];T.sup[k]=val;save();}
+function chipStatus(m){const r=DB.records[key(UI.fecha,UI.turno,m.id)];
+  if(m.estado==='FS'&&!r)return ['#9AA7B5','FS'];
+  if(!r)return ['#CBD5E1','sin carga'];
+  if(r.estado==='FS')return ['#9AA7B5','FS'];if(r.estado==='NOPROG')return ['#9AA7B5','no prog.'];
+  const a=calc(r,UI.turno),sr=a.carga-a.prod-a.pt;
+  if(!r.prod.length&&!r.paradas.length)return ['#CBD5E1','vacío'];
+  return sr>30?['#F2A93B','falta '+nf(sr)+' min']:['#22A06B','ok'];}
+function renderChips(){$('#chips').innerHTML=DB.machines.map(m=>{const [c,t]=chipStatus(m);return `<div class="chip ${UI.maq===m.id?'sel':''}" onclick="UI.maq='${m.id}';renderChips();renderPanel()"><span class="dot" style="background:${c}"></span>${esc(m.nombre)}<span class="mut" style="font-weight:600;font-size:11px">${t}</span></div>`;}).join('');}
+function stdOptions(m){return DB.standards.filter(s=>s.maq===m.std);}
+function renderPanel(){
+  const m=mach(UI.maq),rec=getRec(UI.fecha,UI.turno,m.id);const opts=stdOptions(m);
+  const prodRows=rec.prod.map((p,i)=>`<tr>
+   <td style="min-width:380px">${p.manual?`<input placeholder="Pieza (fuera de maestro)" value="${esc(p.pieza)}" oninput="pSet(${i},'pieza',this.value)">`:
+     `<select onchange="pPick(${i},this.value)"><option value="">— elegir pieza —</option>${opts.map(s=>`<option value="${s.id}" ${p.stdId===s.id?'selected':''}>${esc(s.comp)} · ${esc(s.codigo)} ${esc(s.op)} (${esc(s.modelo)}) · ${nf(s.std)}/h${s.estado==='conflicto'&&!s.validado?' ⚠':''}</option>`).join('')}<option value="__manual" >➕ Pieza fuera del maestro…</option></select>`}</td>
+   <td><input type="number" ${p.manual?'':'readonly'} value="${p.std||''}" style="${p.manual?'':'background:#F4F8FC'}" oninput="pSet(${i},'std',this.value)" title="Estándar golpes/hora"></td>
+   <td><input type="time" value="${p.ini||''}" onchange="pTime(${i},'ini',this.value)"></td>
+   <td><input type="time" value="${p.fin||''}" onchange="pTime(${i},'fin',this.value)"></td>
+   <td><input type="number" value="${p.min??''}" oninput="pSet(${i},'min',this.value)" id="pmin${i}"></td>
+   <td><input type="number" value="${p.golpes??''}" oninput="pSet(${i},'golpes',this.value)"></td>
+   <td><input type="number" value="${p.malas??''}" oninput="pSet(${i},'malas',this.value)" style="width:70px"></td>
+   <td><input value="${esc(p.obs||'')}" oninput="pSet(${i},'obs',this.value)" placeholder="Obs."></td>
+   <td><button class="btn bad sm" onclick="pDel(${i})">✕</button></td></tr>`).join('');
+  const parRows=rec.paradas.map((q,i)=>`<tr>
+   <td><select onchange="qSet(${i},'cat',this.value,true)">${DB.cats.map(c=>`<option value="${c.id}" ${q.cat===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></td>
+   <td style="min-width:240px"><select onchange="qSet(${i},'causa',this.value)"><option value="">— causa —</option>${(DB.causes[q.cat]||[]).map(c=>`<option ${q.causa===c?'selected':''}>${esc(c)}</option>`).join('')}</select></td>
+   <td><input type="time" value="${q.ini||''}" onchange="qTime(${i},'ini',this.value)"></td>
+   <td><input type="time" value="${q.fin||''}" onchange="qTime(${i},'fin',this.value)"></td>
+   <td><input type="number" value="${q.min??''}" oninput="qSet(${i},'min',this.value)" id="qmin${i}"></td>
+   <td><input value="${esc(q.obs||'')}" oninput="qSet(${i},'obs',this.value)" placeholder="Detalle libre"></td>
+   <td><button class="btn bad sm" onclick="qDel(${i})">✕</button></td></tr>`).join('');
+  $('#panel').innerHTML=`<div class="card">
+   <div class="row" style="margin-bottom:6px"><h3 style="margin:0">${esc(m.nombre)} <span class="mut" style="font-weight:400">· ${UI.turno} · ${UI.fecha.split('-').reverse().join('/')}</span></h3>
+     <label class="f">Estado<select onchange="getRec(UI.fecha,UI.turno,'${m.id}').estado=this.value;save();renderChips();renderPanel()"><option value="OPERA" ${rec.estado==='OPERA'?'selected':''}>Opera</option><option value="NOPROG" ${rec.estado==='NOPROG'?'selected':''}>No programada</option><option value="FS" ${rec.estado==='FS'?'selected':''}>Fuera de servicio</option></select></label>
+     ${m.nota?`<span class="mut" style="padding-bottom:8px">ℹ ${esc(m.nota)}</span>`:''}</div>
+   ${rec.estado!=='OPERA'?`<div class="banner">Esta máquina no entra en el tiempo de carga del turno (no cuenta como pérdida de OA).</div>`:`
+   <div id="sum"></div>
+   <h3 style="margin-top:12px">Producción <span class="mut" style="font-weight:400">— el estándar se toma solo del maestro; cargá hora inicio/fin (o los minutos) y los golpes</span></h3>
+   <div style="overflow:auto"><table><thead><tr><th>Pieza</th><th>STD g/h</th><th>Inicio</th><th>Fin</th><th>Min</th><th>Golpes</th><th>Malas</th><th>Obs</th><th></th></tr></thead><tbody>${prodRows||'<tr><td colspan="9" class="mut">Sin tramos de producción.</td></tr>'}</tbody></table></div>
+   <button class="btn sm" style="margin-top:8px" onclick="pAdd()">➕ Agregar tramo de producción</button>
+   <h3 style="margin-top:16px">Paradas</h3>
+   <div style="overflow:auto"><table><thead><tr><th>Categoría</th><th>Causa (catálogo)</th><th>Inicio</th><th>Fin</th><th>Min</th><th>Detalle</th><th></th></tr></thead><tbody>${parRows||'<tr><td colspan="7" class="mut">Sin paradas.</td></tr>'}</tbody></table></div>
+   <button class="btn or sm" style="margin-top:8px" onclick="qAdd()">➕ Agregar parada</button>`}
+  </div>`;
+  refreshSum();
+}
+function refreshSum(){const el=$('#sum');if(!el)return;const rec=getRec(UI.fecha,UI.turno,UI.maq),a=calc(rec,UI.turno),mt=metrics(a),M=DB.cfg.metas;
+  const exc=a.prod+a.pt-a.carga;
+  el.innerHTML=`<div class="sumbar">
+   <div class="sum"><small>Carga turno</small><b>${nf(a.carga)}</b> min</div>
+   <div class="sum"><small>Producción</small><b>${nf(a.prod)}</b> min</div>
+   <div class="sum"><small>Paradas</small><b>${nf(a.pt)}</b> min</div>
+   <div class="sum" style="${mt.sinReg>30?'background:#FFF4E5':''}"><small>Sin registrar</small><b>${nf(mt.sinReg)}</b> min</div>
+   <div class="sum"><small>Golpes</small><b>${nf(a.golpes)}</b> <span class="mut">/ ${nf(a.teor)} teór.</span></div>
+   <div class="sum" style="border-left:5px solid ${sem(mt.rend,M.rend)}"><small>Rendimiento</small><b>${pct(mt.rend)}</b></div>
+   <div class="sum" style="border-left:5px solid ${sem(mt.oa,M.oa)}"><small>OA (Disp×Rend)</small><b>${pct(mt.oa)}</b></div></div>
+   ${exc>0?`<div class="banner red">⚠ Producción + paradas superan la carga del turno por ${nf(exc)} min. Revisá los horarios.</div>`:''}
+   ${a.sinStd>0?`<div class="banner">Hay ${nf(a.sinStd)} min con piezas fuera del maestro (sin estándar): no entran en el Rendimiento.</div>`:''}`;}
+function pAdd(){const rec=getRec(UI.fecha,UI.turno,UI.maq);rec.prod.push({stdId:'',pieza:'',codigo:'',op:'',std:0,manual:false,ini:'',fin:'',min:'',golpes:'',malas:0,obs:''});save();renderChips();renderPanel();}
+function pDel(i){getRec(UI.fecha,UI.turno,UI.maq).prod.splice(i,1);save();renderChips();renderPanel();}
+function pPick(i,val){const rec=getRec(UI.fecha,UI.turno,UI.maq),p=rec.prod[i];
+  if(val==='__manual'){p.manual=true;p.stdId='';p.std=0;p.pieza='';}
+  else{const s=DB.standards.find(x=>x.id===val);p.stdId=val;if(s){p.pieza=s.comp;p.codigo=s.codigo;p.op=s.op;p.std=s.std;}else p.std=0;}
+  save();renderChips();renderPanel();}
+function pSet(i,k,val){const p=getRec(UI.fecha,UI.turno,UI.maq).prod[i];p[k]=(k==='obs'||k==='pieza')?val:(val===''?'':+val);save();refreshSum();renderChips();}
+function pTime(i,k,val){const p=getRec(UI.fecha,UI.turno,UI.maq).prod[i];p[k]=val;const d=diffMin(p.ini,p.fin);if(d!=null){p.min=d;const e=$('#pmin'+i);if(e)e.value=d;}save();refreshSum();renderChips();}
+function qAdd(){const rec=getRec(UI.fecha,UI.turno,UI.maq);rec.paradas.push({cat:'SETUP',causa:'',ini:'',fin:'',min:'',obs:''});save();renderChips();renderPanel();}
+function qDel(i){getRec(UI.fecha,UI.turno,UI.maq).paradas.splice(i,1);save();renderChips();renderPanel();}
+function qSet(i,k,val,redraw){const q=getRec(UI.fecha,UI.turno,UI.maq).paradas[i];q[k]=(k==='min')?(val===''?'':+val):val;if(k==='cat')q.causa='';save();if(redraw)renderPanel();else refreshSum();renderChips();}
+function qTime(i,k,val){const q=getRec(UI.fecha,UI.turno,UI.maq).paradas[i];q[k]=val;const d=diffMin(q.ini,q.fin);if(d!=null){q.min=d;const e=$('#qmin'+i);if(e)e.value=d;}save();refreshSum();renderChips();}
+function cerrarTurno(){const T=DB.turnos[UI.fecha+'|'+UI.turno],probs=[];
+  if(!T.sup.leg.trim()||!T.sup.nom.trim())probs.push('Falta legajo y nombre del supervisor.');
+  for(const m of DB.machines){const r=DB.records[key(UI.fecha,UI.turno,m.id)];
+    if(!r){if(m.estado==='OPERA')probs.push(m.nombre+': sin carga.');continue;}
+    if(r.estado!=='OPERA')continue;const a=calc(r,UI.turno);
+    if(!r.prod.length&&!r.paradas.length)probs.push(m.nombre+': sin producción ni paradas (si no corrió, marcala como No programada).');
+    else if(a.carga-a.prod-a.pt>30)probs.push(m.nombre+': faltan '+nf(a.carga-a.prod-a.pt)+' min por explicar.');
+    if(r.prod.some(p=>!(+p.min>0)))probs.push(m.nombre+': hay tramos sin minutos.');}
+  if(probs.length){info('<b>Antes de cerrar el turno:</b><ul style="padding-left:18px;margin:8px 0 0">'+probs.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>');return;}
+  T.cerrado=true;save();render();info('Turno cerrado ✔');}
+
+/* ---------- INFORME ---------- */
+function viewInforme(v){
+  const R=UI.rf;if(!R.fecha)R.fecha=lastDate();
+  const M=DB.cfg.metas;
+  const sel=(f,t,m)=>f===R.fecha&&(!R.turno||t===R.turno)&&(!R.maq||m===R.maq);
+  const day=recsWhere(sel),A=aggRecs(day),X=metrics(A);
+  const fsList=DB.machines.filter(m=>{const rs=recsWhere((f,t,mm)=>f===R.fecha&&mm===m.id&&(!R.turno||t===R.turno));return rs.length?rs.every(r=>r.rec.estado==='FS'):m.estado==='FS';}).map(m=>m.nombre);
+  /* por máquina */
+  const byM=DB.machines.map(m=>{const rs=day.filter(r=>r.maq===m.id);const a=aggRecs(rs);return {m,a,x:metrics(a),n:rs.length};}).filter(o=>o.n&&o.a.carga>0);
+  /* tendencia */
+  const dates=[...new Set(Object.keys(DB.records).map(k=>k.split('|')[0]))].filter(d=>d<=R.fecha).sort().slice(-(+R.rango));
+  const tr=dates.map(d=>{const a=aggRecs(recsWhere((f,t,m)=>f===d&&(!R.turno||t===R.turno)&&(!R.maq||m===R.maq)));return {label:d.slice(8)+'/'+d.slice(5,7),val:metrics(a).oa};});
+  const catItems=DB.cats.map(c=>({label:c.name,val:A.par[c.id]||0,color:c.color})).filter(i=>i.val>0).sort((a,b)=>b.val-a.val);
+  const cz=Object.entries(A.causas).map(([k,val])=>{const [cid,causa]=k.split('|');return {label:causa,val,color:catOf(cid).color,cat:catOf(cid).name};}).sort((a,b)=>b.val-a.val).slice(0,8);
+  const fmtD=R.fecha.split('-').reverse().join('/');
+  const k=(t,val,meta,sub)=>`<div class="kpi" style="background:${meta==null?'#0B2545':sem(val,meta)}"><small>${t}</small><b>${pct(val)}</b><span>${sub||''}${meta!=null?' · meta '+meta+'%':''}</span></div>`;
+  const top3=cz.slice(0,3).map(c=>`${esc(c.label)} (${nf(c.val)} min)`).join('; ');
+  const msg=A.carga?`<b>${fmtD}${R.turno?' · '+R.turno:''}:</b> la línea registró <b>${nf(A.golpes)} golpes</b> contra <b>${nf(A.teor)}</b> posibles a estándar según las piezas que se corrieron (<b>${pct(X.rend)}</b> de rendimiento). OA <b>${pct(X.oa)}</b> (meta ${M.oa}%), disponibilidad ${pct(X.disp)}. Se perdieron <b>${nf(A.pt)} min</b> por paradas${top3?`; principales causas: ${top3}`:''}.${fsList.length?` Fuera de servicio (no cuenta en OA): ${esc(fsList.join(', '))}.`:''}`:'<span class="mut">No hay datos cargados para la selección.</span>';
+  const dopts=[...new Set(Object.keys(DB.records).map(k=>k.split('|')[0]))].sort().reverse();
+  v.innerHTML=demoBanner()+`
+  <div class="card noprint"><div class="row">
+    <label class="f">Fecha<select onchange="UI.rf.fecha=this.value;render()">${(dopts.includes(R.fecha)?dopts:[R.fecha,...dopts]).map(d=>`<option value="${d}" ${d===R.fecha?'selected':''}>${d.split('-').reverse().join('/')}</option>`).join('')}</select></label>
+    <label class="f">Turno<select onchange="UI.rf.turno=this.value;render()"><option value="">Ambos</option>${TURNOS.map(t=>`<option ${R.turno===t?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="f">Máquina<select onchange="UI.rf.maq=this.value;render()"><option value="">Toda la línea</option>${DB.machines.map(m=>`<option value="${m.id}" ${R.maq===m.id?'selected':''}>${esc(m.nombre)}</option>`).join('')}</select></label>
+    <label class="f">Tendencia<select onchange="UI.rf.rango=this.value;render()">${['7','14','30'].map(n=>`<option value="${n}" ${R.rango===n?'selected':''}>Últimos ${n} días</option>`).join('')}</select></label>
+    <div style="margin-left:auto;display:flex;gap:8px"><button class="btn vio" onclick="window.print()">🖨 Imprimir / PDF</button><button class="btn nv" onclick="exportInforme()">⬇ CSV por máquina</button></div>
+  </div></div>
+  <div class="card"><h3>Informe diario · Línea de prensas · UET 5 · ${fmtD}</h3><div class="msg">${msg}</div></div>
+  <div class="kpis">
+    ${k('OA (Disp × Rend)',X.oa,M.oa,'sin calidad')}${k('Rendimiento',X.rend,M.rend,'golpes reales / teóricos')}
+    ${k('Disponibilidad',X.disp,null,'producción / carga')}${k('Calidad',X.cal,M.cal,nf(A.malas)+' piezas malas')}
+    <div class="kpi" style="background:#2E9BD6"><small>Golpes reales</small><b>${nf(A.golpes)}</b><span>teóricos ${nf(A.teor)}</span></div>
+    <div class="kpi" style="background:#F28C28"><small>Paradas</small><b>${nf(A.pt)} min</b><span>${A.carga?pct(A.pt/A.carga):'—'} de la carga · sin registrar ${nf(X.sinReg)} min</span></div>
+  </div>
+  <div class="grid2">
+   <div class="card"><h3>Golpes reales vs. teóricos por máquina</h3>${byM.length?svgBars(byM.map(o=>o.m.nombre),[{name:'Teóricos',color:'#8DC9EE',vals:byM.map(o=>Math.round(o.a.teor))},{name:'Reales',color:'#0B2545',vals:byM.map(o=>o.a.golpes)}]):'<p class="mut">Sin datos.</p>'}<div class="legend"><span><i style="background:#8DC9EE"></i>Teóricos a estándar</span><span><i style="background:#0B2545"></i>Reales</span></div></div>
+   <div class="card"><h3>OA por máquina</h3>${byM.length?svgHBars(byM.map(o=>({label:o.m.nombre,val:o.x.oa,color:sem(o.x.oa,M.oa)}))):'<p class="mut">Sin datos.</p>'}<div class="legend"><span><i style="background:#22A06B"></i>≥ meta</span><span><i style="background:#F2A93B"></i>hasta 10 pts debajo</span><span><i style="background:#E5484D"></i>más de 10 pts debajo</span></div></div>
+   <div class="card"><h3>Tendencia de OA (bandas de semáforo)</h3>${svgTrend(tr,M.oa)}</div>
+   <div class="card"><h3>Radar · Disponibilidad / Rendimiento / Calidad / OA</h3>${svgRadar([{label:'Disponibilidad',val:X.disp,meta:M.oa},{label:'Rendimiento',val:X.rend,meta:M.rend},{label:'Calidad',val:X.cal,meta:M.cal},{label:'OA',val:X.oa,meta:M.oa}])}</div>
+   <div class="card"><h3>Paradas por categoría</h3>${svgDonut(catItems)}</div>
+   <div class="card"><h3>Pareto de causas (top 8, minutos)</h3>${svgPareto(cz)}</div>
+  </div>
+  <div class="card"><h3>Resumen por máquina</h3><div style="overflow:auto"><table><thead><tr><th>Máquina</th><th class="r">Carga</th><th class="r">Prod. min</th><th class="r">Paradas</th><th class="r">Golpes</th><th class="r">Teóricos</th><th class="r">Rend.</th><th class="r">Disp.</th><th class="r">OA</th><th>Principal desvío</th></tr></thead><tbody>
+   ${byM.map(o=>{const top=Object.entries(o.a.causas).sort((a,b)=>b[1]-a[1])[0];return `<tr><td><b>${esc(o.m.nombre)}</b></td><td class="r">${nf(o.a.carga)}</td><td class="r">${nf(o.a.prod)}</td><td class="r">${nf(o.a.pt)}</td><td class="r">${nf(o.a.golpes)}</td><td class="r">${nf(o.a.teor)}</td><td class="r"><span class="tag" style="background:${sem(o.x.rend,M.rend)}">${pct(o.x.rend,0)}</span></td><td class="r">${pct(o.x.disp,0)}</td><td class="r"><span class="tag" style="background:${sem(o.x.oa,M.oa)}">${pct(o.x.oa,0)}</span></td><td>${top?esc(top[0].split('|')[1])+' · '+nf(top[1])+' min':'—'}</td></tr>`;}).join('')||'<tr><td colspan="10" class="mut">Sin datos.</td></tr>'}
+  </tbody></table></div></div>`;
+}
+function exportInforme(){const R=UI.rf;const rows=[['fecha','turno','maquina','carga_min','prod_min','paradas_min','golpes','teoricos','rendimiento','disponibilidad','oa']];
+  recsWhere((f,t,m)=>f===R.fecha&&(!R.turno||t===R.turno)).forEach(r=>{const a=calc(r.rec,r.turno),x=metrics(a);rows.push([r.fecha,r.turno,r.maq,a.carga,a.prod,a.pt,a.golpes,Math.round(a.teor),x.rend==null?'':x.rend.toFixed(4),x.disp==null?'':x.disp.toFixed(4),x.oa==null?'':x.oa.toFixed(4)]);});
+  dl('informe_'+R.fecha+'.csv',rows.map(r=>r.join(';')).join('\n'));}
+function dl(name,text,mime='text/csv'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+text],{type:mime+';charset=utf-8'}));a.download=name;a.click();}
+
+/* ---------- MAESTRO ---------- */
+function viewMaestro(v){
+  v.innerHTML=`<div class="sub2"><button class="${UI.sub==='std'?'on':''}" onclick="UI.sub='std';render()">Estándares</button><button class="${UI.sub==='maq'?'on':''}" onclick="UI.sub='maq';render()">Máquinas</button><button class="${UI.sub==='cau'?'on':''}" onclick="UI.sub='cau';render()">Catálogo de causas</button></div><div id="sub"></div>`;
+  ({std:subStd,maq:subMaq,cau:subCau})[UI.sub]($('#sub'));
+}
+const ESTADO={ok:['#22A06B','Coinciden','Coinciden en las dos planillas'],conflicto:['#F28C28','Conflicto','A y B tienen STD distinto'],unica:['#2E9BD6','1 fuente','Figura en una sola planilla'],nuevo:['#8E4EC6','Nuevo','Agregado en la app']};
+function stdFiltered(){const F=UI.sf,q=F.q.toLowerCase();return DB.standards.filter(s=>(!F.maq||s.maq===F.maq)&&(!F.estado||(F.estado==='pend'?(s.estado==='conflicto'&&!s.validado):F.estado==='val'?s.validado:s.estado===F.estado))&&(!q||(s.comp+' '+s.codigo+' '+s.modelo+' '+s.opn).toLowerCase().includes(q)));}
+function subStd(el){
+  const F=UI.sf,list=stdFiltered(),cnt=e=>DB.standards.filter(e).length;
+  el.innerHTML=`<div class="card"><div class="row">
+   <label class="f">Máquina<select onchange="UI.sf.maq=this.value;render()"><option value="">Todas</option>${DB.machines.map(m=>`<option value="${m.std}" ${F.maq===m.std?'selected':''}>${esc(m.nombre)} (${esc(m.std)})</option>`).join('')}</select></label>
+   <label class="f">Estado<select onchange="UI.sf.estado=this.value;render()"><option value="">Todos</option><option value="pend" ${F.estado==='pend'?'selected':''}>Conflictos pendientes</option><option value="ok" ${F.estado==='ok'?'selected':''}>Coinciden</option><option value="unica" ${F.estado==='unica'?'selected':''}>Una sola fuente</option><option value="val" ${F.estado==='val'?'selected':''}>Validados</option></select></label>
+   <label class="f">Buscar<input value="${esc(F.q)}" placeholder="componente, código, modelo…" oninput="UI.sf.q=this.value;clearTimeout(window._t);window._t=setTimeout(()=>{subStd($('#sub'));const i=document.querySelector('#sub input[placeholder^=componente]');i.focus();i.setSelectionRange(99,99)},250)"></label>
+   <div style="margin-left:auto;display:flex;gap:8px"><button class="btn ok" onclick="stdAdd()">➕ Agregar estándar</button><button class="btn nv" onclick="exportStd()">⬇ Exportar CSV</button></div></div>
+   <p class="mut" style="margin:10px 0 0">${DB.standards.length} estándares · <b>${cnt(s=>s.estado==='conflicto'&&!s.validado)}</b> conflictos sin resolver · ${cnt(s=>s.validado)} validados · mostrando ${list.length}.
+   Los cambios aplican a los cierres <b>nuevos</b>; lo ya cargado conserva el estándar con el que se registró.</p></div>
+   <div class="scroll"><table><thead><tr><th>✔</th><th>Estado</th><th>Modelo</th><th>Código</th><th>Componente</th><th>Op.</th><th>Máquina</th><th class="r">STD g/h</th><th>Alternativa (B)</th><th>Toma de tiempos</th><th></th></tr></thead><tbody>
+   ${list.map(s=>{const e=ESTADO[s.estado]||ESTADO.unica;return `<tr class="${s.validado?'val':s.estado==='conflicto'?'conf':''}">
+    <td><input type="checkbox" style="width:auto" ${s.validado?'checked':''} onchange="stdVal('${s.id}',this.checked)" title="Validado por ingeniería"></td>
+    <td><span class="tag" style="background:${s.validado&&s.estado==='conflicto'?'#177a50':e[0]}" title="${e[2]}">${s.validado&&s.estado==='conflicto'?'Resuelto':e[1]}</span></td>
+    <td><input value="${esc(s.modelo)}" onchange="stdSet('${s.id}','modelo',this.value)" style="min-width:100px"></td>
+    <td><input value="${esc(s.codigo)}" onchange="stdSet('${s.id}','codigo',this.value)" style="min-width:105px"></td>
+    <td><input value="${esc(s.comp)}" onchange="stdSet('${s.id}','comp',this.value)" style="min-width:260px"></td>
+    <td><input value="${esc(s.op)}" onchange="stdSet('${s.id}','op',this.value)" style="width:72px"></td>
+    <td><select onchange="stdSet('${s.id}','maq',this.value)">${DB.machines.map(m=>`<option value="${m.std}" ${s.maq===m.std?'selected':''}>${esc(m.std)}</option>`).join('')}</select></td>
+    <td><input type="number" step="any" value="${s.std}" onchange="stdSet('${s.id}','std',+this.value)" style="font-weight:700"></td>
+    <td>${s.stdAlt!=null&&!s.validado?`<b>${nf(s.stdAlt,2)}</b> <button class="btn sm or" onclick="stdUse('${s.id}','B')">Usar B</button> <button class="btn sm ghost" onclick="stdUse('${s.id}','A')">Mantener A</button>`:s.stdAlt!=null?`<span class="mut">B: ${nf(s.stdAlt,2)}</span>`:'<span class="mut">—</span>'}</td>
+    <td><input type="date" value="${s.fecha||''}" onchange="stdSet('${s.id}','fecha',this.value)"></td>
+    <td><button class="btn bad sm" onclick="stdDel('${s.id}')">✕</button></td></tr>`;}).join('')}
+   </tbody></table></div>`;
+}
+function stdSet(id,k,val){const s=DB.standards.find(x=>x.id===id);s[k]=val;save();}
+function stdVal(id,on){const s=DB.standards.find(x=>x.id===id);s.validado=on;save();render();}
+function stdUse(id,w){const s=DB.standards.find(x=>x.id===id);if(w==='B'){const a=s.std;s.std=s.stdAlt;s.stdAlt=a;}s.validado=true;s.estado='conflicto';save();render();}
+function stdAdd(){const m=UI.sf.maq||DB.machines[0].std;const id='N'+Date.now().toString(36);DB.standards.unshift({id,modelo:'',codigo:'',op:'',maq:m,comp:'Nuevo estándar',opn:'',ppu:null,fecha:today(),validado:false,stdAlt:null,std:0,estado:'nuevo',src:'N'});save();render();}
+function stdDel(id){const s=DB.standards.find(x=>x.id===id);ask('¿Eliminar el estándar <b>'+esc(s.comp)+'</b>?',()=>{DB.standards=DB.standards.filter(x=>x.id!==id);save();render();});}
+function exportStd(){const rows=[['id','modelo','codigo','componente','op','nombre_op','maquina','std_golpes_h','std_alternativo','fecha_toma','estado','validado']];
+  DB.standards.forEach(s=>rows.push([s.id,s.modelo,s.codigo,s.comp,s.op,s.opn||'',s.maq,s.std,s.stdAlt??'',s.fecha||'',s.estado,s.validado?'SI':'']));
+  dl('estandares_UET5.csv',rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n'));}
+function subMaq(el){
+  el.innerHTML=`<div class="card"><p class="mut" style="margin-top:0">Equivalencias entre el código de Pérdidas (ID) y el código del maestro de estándares. Las marcadas con ℹ están por confirmar.</p>
+  <table><thead><tr><th>ID</th><th>Nombre</th><th>Código en estándares</th><th>Estado por defecto</th><th>Nota</th></tr></thead><tbody>
+  ${DB.machines.map((m,i)=>`<tr><td><b>${esc(m.id)}</b></td><td><input value="${esc(m.nombre)}" onchange="DB.machines[${i}].nombre=this.value;save()"></td><td><input value="${esc(m.std)}" onchange="DB.machines[${i}].std=this.value;save()"></td>
+   <td><select onchange="DB.machines[${i}].estado=this.value;save()"><option value="OPERA" ${m.estado==='OPERA'?'selected':''}>Opera</option><option value="FS" ${m.estado==='FS'?'selected':''}>Fuera de servicio</option></select></td>
+   <td><input value="${esc(m.nota)}" onchange="DB.machines[${i}].nota=this.value;save()"></td></tr>`).join('')}</tbody></table></div>`;}
+function subCau(el){
+  el.innerHTML=`<div class="card"><p class="mut" style="margin-top:0">Catálogo propuesto a partir del texto libre de la planilla de pérdidas (hoy hay más de 700 redacciones distintas). Se edita acá y alimenta la lista desplegable de la carga y el Pareto.</p>
+  <div class="grid2">${DB.cats.map(c=>`<div class="card" style="margin:0;border-top:4px solid ${c.color}"><h3>${esc(c.name)}</h3>
+   ${(DB.causes[c.id]||[]).map((t,i)=>`<div class="row" style="margin-bottom:5px"><input style="flex:1" value="${esc(t)}" onchange="DB.causes['${c.id}'][${i}]=this.value;save()"><button class="btn bad sm" onclick="DB.causes['${c.id}'].splice(${i},1);save();render()">✕</button></div>`).join('')}
+   <button class="btn sm" onclick="(DB.causes['${c.id}']=DB.causes['${c.id}']||[]).push('Nueva causa');save();render()">➕ Causa</button></div>`).join('')}</div></div>`;}
+
+/* ---------- CONFIG ---------- */
+function viewConfig(v){const C=DB.cfg;
+  v.innerHTML=demoBanner()+`<div class="grid2"><div class="card"><h3>Turnos y metas</h3><div class="row">
+   ${TURNOS.map(t=>`<label class="f">Carga ${t} (min netos)<input type="number" value="${C.carga[t]}" onchange="DB.cfg.carga['${t}']=+this.value;save()"></label>`).join('')}
+   <label class="f">Meta OA %<input type="number" value="${C.metas.oa}" onchange="DB.cfg.metas.oa=+this.value;save()"></label>
+   <label class="f">Meta Rendimiento %<input type="number" value="${C.metas.rend}" onchange="DB.cfg.metas.rend=+this.value;save()"></label>
+   <label class="f">Meta Calidad %<input type="number" value="${C.metas.cal}" onchange="DB.cfg.metas.cal=+this.value;save()"></label></div>
+   <p class="mut">Carga = 9 h menos asakai, descansos, comida y limpieza (485 min netos por turno, como en la planilla). OA = Disponibilidad × Rendimiento.</p></div>
+  <div class="card"><h3>Datos</h3><div class="row">
+   <button class="btn nv" onclick="dl('planillasdecontrol_backup_'+today()+'.json',JSON.stringify(DB),'application/json')">⬇ Backup (JSON)</button>
+   <label class="btn ok" style="cursor:pointer">⬆ Restaurar backup<input type="file" accept=".json" style="display:none" onchange="restore(this)"></label>
+   <button class="btn vio" onclick="loadDemo();save();render()">🧪 Cargar datos de demo</button>
+   <button class="btn bad" onclick="clearDemo()">Borrar datos de demo</button>
+   <button class="btn or" onclick="resetAll()">Reiniciar todo</button></div>
+   <p class="mut">v1 guarda en este navegador. La base compartida entre turnos y la API están pendientes (repo PlanillasdeControlAPI).</p></div></div>`;}
+function restore(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{DB=JSON.parse(String(r.result).replace(/^﻿/,''));save();render();}catch(e){info('Archivo inválido');}};r.readAsText(f);}
+function resetAll(){ask('Se borra <b>todo</b> lo cargado y se restaura el maestro original. ¿Seguir?',()=>{DB=fresh();save();render();});}
+function clearDemo(){ask('Se borran solo los datos de demostración.',()=>{for(const k in DB.records)if(DB.records[k].demo)delete DB.records[k];for(const k in DB.turnos)if(DB.turnos[k].demo)delete DB.turnos[k];DB.demoLoaded=false;save();render();});}
+
+/* ---------- DEMO (simulado, determinístico) ---------- */
+function rng(seed){let s=seed;return()=>{s=(s*1664525+1013904223)%4294967296;return s/4294967296;};}
+function loadDemo(){
+  const days=['2026-11-02','2026-11-03','2026-11-04','2026-11-05','2026-11-06','2026-11-09','2026-11-10','2026-11-11','2026-11-12'];
+  const R=rng(20261113);
+  days.forEach(d=>TURNOS.forEach(t=>{
+    DB.turnos[d+'|'+t]={sup:{leg:'DEMO',nom:'Supervisor demo'},cerrado:true,demo:true};
+    DB.machines.forEach(m=>{
+      const k=key(d,t,m.id);if(DB.records[k])return;
+      if(m.estado==='FS'){DB.records[k]={estado:'FS',prod:[],paradas:[],demo:true};return;}
+      const opts=stdOptions(m);if(!opts.length)return;
+      const rec={estado:'OPERA',prod:[],paradas:[],demo:true};const ini=toMin(DB.cfg.horario[t][0])+15;let cur=ini;const carga=DB.cfg.carga[t];
+      const stops=[];
+      if(R()<.55)stops.push(['SETUP',DB.causes.SETUP[Math.floor(R()*3)],15+Math.floor(R()*5)*10]);
+      if(R()<.25)stops.push(['MANT',DB.causes.MANT[Math.floor(R()*DB.causes.MANT.length)],20+Math.floor(R()*10)*10]);
+      if(R()<.18)stops.push(['FOP',DB.causes.FOP[0],60+Math.floor(R()*4)*30]);
+      if(R()<.22)stops.push(['ESP',DB.causes.ESP[Math.floor(R()*DB.causes.ESP.length)],15+Math.floor(R()*4)*15]);
+      if(R()<.08)stops.push(['MATR',DB.causes.MATR[Math.floor(R()*3)],30+Math.floor(R()*3)*20]);
+      const pt=stops.reduce((s,x)=>s+x[2],0);let left=Math.max(60,carga-pt-Math.floor(R()*12));
+      const np=left>260?2:1;const hh=x=>String(Math.floor(x/60)%24).padStart(2,'0')+':'+String(x%60).padStart(2,'0');
+      for(let i=0;i<np;i++){const s=opts[Math.floor(R()*opts.length)];const mn=i===np-1?left:Math.round(left/np);left-=mn;
+        const eff=.72+R()*.28;rec.prod.push({stdId:s.id,pieza:s.comp,codigo:s.codigo,op:s.op,std:s.std,manual:false,ini:hh(cur),fin:hh(cur+mn),min:mn,golpes:Math.round(mn*s.std/60*eff),malas:Math.round(R()<.3?R()*14:0),obs:''});cur+=mn;}
+      stops.forEach(x=>{rec.paradas.push({cat:x[0],causa:x[1],ini:'',fin:'',min:x[2],obs:''});});
+      DB.records[k]=rec;});}));
+  DB.demoLoaded=true;
+}
+
+/* ===================== INICIO ===================== */
+DB=loadDB();if(!DB||!DB.v){DB=fresh();loadDemo();save();}
+UI.rf.fecha=lastDate();UI.fecha=today();
+render();
+</script>
+</body>
+</html>
