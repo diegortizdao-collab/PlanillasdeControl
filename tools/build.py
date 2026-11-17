@@ -4,6 +4,7 @@ import json, pathlib, base64
 root = pathlib.Path(__file__).resolve().parent.parent
 tpl = (root / "src/index.template.html").read_text(encoding="utf-8")
 std = json.loads((root / "data/estandares.json").read_text(encoding="utf-8"))
+for r in std: r["modelo"] = (r.get("modelo") or "").upper()
 def uri(f): return "data:image/png;base64," + base64.b64encode((root / "assets" / f).read_bytes()).decode()
 tpl = (tpl.replace("__ICONO__", uri("icono-planillas.png")).replace("__LOGO_ESC_AZ__", uri("logo-escorial-azul.png"))
           .replace("__LOGO_SPE__", uri("logo-spe.png")).replace("__FAVICON__", uri("favicon.png")))

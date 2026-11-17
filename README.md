@@ -31,3 +31,11 @@ Desarrollado por Mgter. Diego Ortiz — Líder de Mejora Continua | Consultor IS
 
 ## Base compartida (v2)
 `index.html` trabaja contra la API (`PlanillasdeControlAPI`, Neon): pide la clave de acceso, carga catálogos/estándares/cierres de la base y **autoguarda** cada cambio (indicador arriba a la derecha). `demo.html` es la versión local con datos simulados (sin base). Para cambiar la URL de la API, editar `API_URL` en `tools/build.py` y correr `python3 tools/build.py`.
+
+## Cambios v3 (observaciones de Gabriel Russo)
+- **Carga por pasos** (Turno → Máquina → Producción → Paradas): lo completado se pliega y aparece lo siguiente; tablas en tarjetas en el celular.
+- **Selector de máquinas** desplegable con buscador predictivo.
+- **Horas en 24 h** con máscara `hh:mm` y salto automático inicio → fin → golpes; el inicio del tramo/parada nuevo propone el fin del anterior.
+- **Operario compartido:** campo *Min. con operario* por máquina y categoría **Desprogramada** (descuenta de la carga, no es pérdida). Entre las máquinas del operario deben sumar la carga del turno (485).
+- **Cerrar turno** sin completar todas las máquinas: las no cargadas quedan *No programadas* (con confirmación).
+- **Planificación:** Gantt por día/turno con producción por modelo, paradas por categoría, cambios de modelo y baches sin declarar.
